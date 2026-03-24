@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11612.150 stable
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "FFXIV_MAHJONG_OCR", "FFXIV_MAHJONG_OCR\FFXIV_MAHJONG_OCR.vbproj", "{C72C1265-806D-46C6-A746-8E4126C69930}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C72C1265-806D-46C6-A746-8E4126C69930}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C72C1265-806D-46C6-A746-8E4126C69930}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C72C1265-806D-46C6-A746-8E4126C69930}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C72C1265-806D-46C6-A746-8E4126C69930}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6BDDB29D-A00F-4E45-83D4-B9E2CE607682}
+	EndGlobalSection
+EndGlobal
