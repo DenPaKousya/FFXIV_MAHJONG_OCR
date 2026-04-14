@@ -105,12 +105,17 @@
         Dim ENC_FILE As System.Text.Encoding
         ENC_FILE = System.Text.Encoding.UTF8
 
+        Dim STR_FILE() As String
         Try
-            STR_DETAIL = System.IO.File.ReadAllLines(STR_PATH, ENC_FILE)
+            STR_FILE = System.IO.File.ReadAllLines(STR_PATH, ENC_FILE)
         Catch ex As Exception
             Return False
         End Try
 
+        ReDim STR_DETAIL(0)
+        For i = 0 To (STR_FILE.Length - 1)
+            Call SUB_ADD_ROW_STRING(STR_DETAIL, STR_FILE(i))
+        Next
         Return True
     End Function
 
@@ -128,5 +133,46 @@
         Return False
     End Function
 
+    Public Sub SUB_ADD_ROW_STRING(ByRef STR_ROW() As String, ByVal STR_ADD As String)
+        Dim INT_INDEX As Integer
+        INT_INDEX = STR_ROW.Length
+        ReDim Preserve STR_ROW(INT_INDEX)
+        STR_ROW(INT_INDEX) = STR_ADD
+    End Sub
+
+    Public Sub SUB_ADD_ROW_INTEGER(ByRef INT_ROW() As Integer, ByVal INT_ADD As Integer)
+        Dim INT_INDEX As Integer
+        INT_INDEX = INT_ROW.Length
+        ReDim Preserve INT_ROW(INT_INDEX)
+        INT_ROW(INT_INDEX) = INT_ADD
+    End Sub
+
+    Public Function FUNC_GET_WHERE_ROW_STRING(ByRef STR_ROW() As String, ByRef STR_CHECK() As String) As String()
+        Dim STR_RET() As String
+        ReDim STR_RET(0)
+        For i = 1 To (STR_ROW.Length - 1)
+            For j = 1 To (STR_CHECK.Length - 1)
+                If STR_ROW(i) = STR_CHECK(j) Then
+                    Call SUB_ADD_ROW_STRING(STR_RET, STR_ROW(i))
+                End If
+            Next
+        Next
+
+        Return STR_RET
+    End Function
+
+    Public Function FUNC_GET_INTEGER_ROW_STRING(ByRef STR_ROW() As String) As Integer()
+        Dim INT_RET() As Integer
+        ReDim INT_RET(0)
+        For i = 1 To (STR_ROW.Length - 1)
+            If IsNumeric(STR_ROW(i)) Then
+                Dim INT_TEMP As Integer
+                INT_TEMP = CInt(STR_ROW(i))
+                Call SUB_ADD_ROW_INTEGER(INT_RET, INT_TEMP)
+            End If
+        Next
+
+        Return INT_RET
+    End Function
 
 End Module

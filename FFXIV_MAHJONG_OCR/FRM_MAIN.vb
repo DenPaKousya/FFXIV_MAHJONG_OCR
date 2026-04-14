@@ -13,12 +13,15 @@
 #End Region
 
 #Region "画面用・構造体"
-
+    Private Structure SRT_RESULT_SCORE
+        Public NAME_PLAYER As String
+        Public POINT As Integer
+    End Structure
 #End Region
 
 #Region "画面用・変数"
     Private BLN_APPL_DO_TASK As Boolean = False
-
+    Private SRT_RESULT() As SRT_RESULT_SCORE
 #End Region
 
 #Region "実行処理呼出"
@@ -97,16 +100,68 @@
         End If
 
         Dim STR_CHECK As String
-        STR_CHECK = ""
+        STR_CHECK = "対局結果"
         If Not FUNC_CHECK_STR_ROW(STR_FILE_DETAIL, STR_CHECK) Then
             Call MessageBox.Show("Error Result Value", Me.Text)
             Exit Sub
         End If
 
+        Dim STR_NAME_CHECK() As String
+        ReDim STR_NAME_CHECK(0)
+        Call SUB_ADD_ROW_STRING(STR_NAME_CHECK, "Jin Alex")
+        Call SUB_ADD_ROW_STRING(STR_NAME_CHECK, "Denpa Kousya")
+        Call SUB_ADD_ROW_STRING(STR_NAME_CHECK, "Denpa Sousya")
+        Call SUB_ADD_ROW_STRING(STR_NAME_CHECK, "Denpa Tousya")
+        Call SUB_ADD_ROW_STRING(STR_NAME_CHECK, "Crow Trismegists")
+        Call SUB_ADD_ROW_STRING(STR_NAME_CHECK, "Gigi Bernstad")
+
+        Dim STR_NAME() As String
+        STR_NAME = FUNC_GET_WHERE_ROW_STRING(STR_FILE_DETAIL, STR_NAME_CHECK)
+        If Not ((STR_NAME.Length - 1) = 4) Then
+            Call MessageBox.Show("Member Check Error (4 people)", Me.Text)
+            Exit Sub
+        End If
+
+        Dim INT_POINT() As Integer
+        INT_POINT = FUNC_GET_INTEGER_ROW_STRING(STR_FILE_DETAIL)
+        If Not ((INT_POINT.Length - 1) = 4) Then
+            Call MessageBox.Show("Score Check Error (4 point)", Me.Text)
+            Exit Sub
+        End If
+
+        ReDim SRT_RESULT(0)
+        For i = 1 To (STR_NAME.Length - 1)
+            Dim INT_INDEX As Integer
+            INT_INDEX = SRT_RESULT.Length
+            ReDim Preserve SRT_RESULT(INT_INDEX)
+            With SRT_RESULT(INT_INDEX)
+                .NAME_PLAYER = STR_NAME(i)
+                .POINT = INT_POINT(i)
+            End With
+        Next
+
+        For i = 1 To (SRT_RESULT.Length - 1)
+            Dim STR_TEMP As String
+            With SRT_RESULT(i)
+                STR_TEMP = ""
+                STR_TEMP &= .NAME_PLAYER
+                STR_TEMP &= ":" & CStr(.POINT)
+
+            End With
+            Call SUB_ADD_OCR_IMAGE_RESULT(STR_TEMP)
+        Next
 
     End Sub
 
 
+#End Region
+
+#Region "画面系"
+    Private Sub SUB_ADD_OCR_IMAGE_RESULT(ByVal STR_ADD As String)
+
+        Call LST_OCR_IMAGE_RESULT.Items.Add(STR_ADD)
+        Call LST_OCR_IMAGE_RESULT.Refresh()
+    End Sub
 #End Region
 
 #Region "初期化・終了処理"
