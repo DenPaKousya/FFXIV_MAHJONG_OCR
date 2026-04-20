@@ -1,4 +1,9 @@
-﻿Public Class FRM_MAIN
+﻿Imports System.IO
+Imports Google.Apis.Auth.OAuth2
+Imports Google.Apis.Sheets.v4
+Imports Google.Apis.Sheets.v4.Data
+
+Public Class FRM_MAIN
 
 #Region "画面用・定数"
 
@@ -39,6 +44,9 @@
                 Call SUB_LOAD_IMAGE()
             Case ENM_MY_TASK.DO_OCR_IMAGE
                 Call SUB_OCR_IMAGE()
+            Case ENM_MY_TASK.DO_ADD_SPREADSHEET
+                Call SUB_ADD_SPREADSHEET()
+
             Case Else
 
         End Select
@@ -153,7 +161,91 @@
 
     End Sub
 
+    Private Sub SUB_ADD_SPREADSHEET()
+        Dim FS_CLIENT_SECRET As FileStream
+        FS_CLIENT_SECRET = New FileStream("my_project.json", FileMode.Open, FileAccess.Read)
 
+        Dim credential As GoogleCredential
+        credential = GoogleCredential.FromStream(FS_CLIENT_SECRET).CreateScoped(SheetsService.Scope.Spreadsheets)
+
+        Dim service As SheetsService
+        service = New SheetsService(New BaseClientService.Initializer() With {.HttpClientInitializer = credential, .ApplicationName = "MyVBApp"})
+
+        Dim sheetId As String
+        sheetId = "1bs8CtWMFVdW1ca4wiP_8IkIizurnLdpBJwzu90xroag"
+
+        Dim pageNameColumnRange As String
+        pageNameColumnRange = "シート1!B1:E1"
+
+        Dim REQ_GET As SpreadsheetsResource.ValuesResource.GetRequest
+        REQ_GET = service.Spreadsheets.Values.Get(sheetId, pageNameColumnRange)
+        Dim pageValues As IList(Of IList(Of Object))
+        pageValues = REQ_GET.Execute().Values
+
+        Dim INT_INDEX As Integer
+        INT_INDEX = 0
+        For i = 1 To 100
+            Dim INT_ROW As Integer
+            INT_ROW = i + 1
+            pageNameColumnRange = "シート1!A" & INT_ROW
+            REQ_GET = service.Spreadsheets.Values.Get(sheetId, pageNameColumnRange)
+            pageValues = REQ_GET.Execute().Values
+
+            If pageValues Is Nothing Then
+                INT_INDEX = i
+                Exit For
+            End If
+        Next
+
+        Dim INT_POINT() As Integer
+        ReDim INT_POINT(4)
+        For i = 1 To (SRT_RESULT.Length - 1)
+            Dim INT_SET_POINT As Integer
+            Select Case SRT_RESULT(i).NAME_PLAYER
+                Case "Jin Alex"
+                    INT_SET_POINT = 3
+                Case "Denpa Kousya"
+                    INT_SET_POINT = 4
+                Case "Crow Trismegists"
+                    INT_SET_POINT = 2
+                Case "Gigi Bernstad"
+                    INT_SET_POINT = 1
+                Case Else
+                    INT_SET_POINT = 0
+            End Select
+            INT_POINT(INT_SET_POINT) = SRT_RESULT(i).POINT
+        Next
+        Dim SET_VALUES As IList(Of IList(Of Object))
+        SET_VALUES = New List(Of IList(Of Object))
+
+        Dim OBJ_VALUES As IList(Of Object)
+        OBJ_VALUES = New List(Of Object)()
+        For i = 1 To (INT_POINT.Length - 1)
+            OBJ_VALUES.Add(INT_POINT(i))
+        Next
+        SET_VALUES.Add(OBJ_VALUES)
+
+        Dim VR_VALUES As ValueRange
+        VR_VALUES = New ValueRange() With {.Values = SET_VALUES}
+
+        Dim REQ_APPEND As SpreadsheetsResource.ValuesResource.UpdateRequest
+        REQ_APPEND = service.Spreadsheets.Values.Update(VR_VALUES, sheetId, "シート1!B2:E2")
+
+        REQ_APPEND.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW
+        Dim RES_APPEND As UpdateValuesResponse
+        RES_APPEND = REQ_APPEND.Execute()
+
+
+        OBJ_VALUES = New List(Of Object)()
+        OBJ_VALUES.Add(Today.ToShortDateString)
+        SET_VALUES = New List(Of IList(Of Object))
+        SET_VALUES.Add(OBJ_VALUES)
+        VR_VALUES = New ValueRange() With {.Values = SET_VALUES}
+        REQ_APPEND = service.Spreadsheets.Values.Update(VR_VALUES, sheetId, "シート1!A2:A2")
+        REQ_APPEND.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW
+        RES_APPEND = REQ_APPEND.Execute()
+
+    End Sub
 #End Region
 
 #Region "画面系"
@@ -198,6 +290,10 @@
     Private Sub BTN_OCR_IMAGE_DO_Click(sender As Object, e As EventArgs) Handles BTN_OCR_IMAGE_DO.Click
         Call SUB_DO_TASK(ENM_MY_TASK.DO_OCR_IMAGE)
     End Sub
+    Private Sub BTN_ADD_SPREADSHEET_Click(sender As Object, e As EventArgs) Handles BTN_ADD_SPREADSHEET.Click
+        Call SUB_DO_TASK(ENM_MY_TASK.DO_ADD_SPREADSHEET)
+    End Sub
+
 #End Region
 
     Private Sub FRM_MAIN_Load(sender As Object, e As EventArgs) Handles Me.Load
