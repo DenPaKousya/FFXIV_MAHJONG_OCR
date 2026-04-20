@@ -203,6 +203,7 @@
     Private Sub FRM_MAIN_Load(sender As Object, e As EventArgs) Handles Me.Load
         Call SUB_CTRL_VIEW_INIT()
         Call SUB_CTRL_VALUE_INIT()
+        'aa
     End Sub
 
 
